@@ -327,3 +327,36 @@ class SetupTestEnv:
             t += 60
         else:
             raise Exception('Timeout waiting for process to end.'.format(timeout))
+
+    def run_test_front(self, ssh_vm_conf=0, testname=None, test_cmd=None, results_path=None, raid=False,
+                 ssh_raid=1, timeout=constants.TIMEOUT):
+        try:
+            if all(client is not None for client in self.ssh_client.values()):
+                current_path = os.path.dirname(sys.modules['__main__'].__file__)
+                # enable key auth between instances
+                for i in xrange(1, ssh_vm_conf + 1):
+                    self.ssh_client[i].put_file(os.path.join(self.localpath,
+                                                             self.connector.key_name + '.pem'),
+                                                '/home/{}/.ssh/id_rsa'.format(self.user))
+                    self.ssh_client[i].run('chmod 0600 /home/{0}/.ssh/id_rsa'.format(self.user))
+                if raid:
+                    self.ssh_client[ssh_raid].put_file(os.path.join(
+                            current_path, 'tests', 'raid.sh'), '/tmp/raid.sh')
+                    self.ssh_client[ssh_raid].run('chmod +x /tmp/raid.sh')
+                    self.ssh_client[ssh_raid].run("sed -i 's/\r//' /tmp/raid.sh")
+                    self.ssh_client[ssh_raid].run('/tmp/raid.sh 0 {} {}'.format(raid, ' '.join(
+                            self.device)))
+                bash_testname = 'run_{}.sh'.format(testname)
+                self.ssh_client[1].put_file(os.path.join(current_path, 'tests', bash_testname),
+                                            '/tmp/{}'.format(bash_testname))
+                self.ssh_client[1].run('chmod +x /tmp/{}'.format(bash_testname))
+                self.ssh_client[1].run("sed -i 's/\r//' /tmp/{}".format(bash_testname))
+                log.info('Starting run command {}'.format(test_cmd))
+                self.ssh_client[1].run(test_cmd)
+                self.ssh_client[1].get_file('/tmp/{}.zip'.format(testname), results_path)
+        except Exception as e:
+            log.exception(e)
+            raise
+        finally:
+            if self.connector:
+                self.connector.teardown()
