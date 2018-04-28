@@ -958,7 +958,7 @@ def test_tensorflow_gpu(provider, keyid, secret, token, imageid, subscription, t
     disk_size = 0
     if provider == constants.AWS:
         instancetype = 'p2.xlarge'
-        disk_size = 30
+        disk_size = 100
     elif provider == constants.AZURE:
         instancetype = 'Standard_NC6'
         region = 'eastus'
