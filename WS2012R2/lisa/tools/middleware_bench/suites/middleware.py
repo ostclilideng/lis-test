@@ -1034,7 +1034,7 @@ def test_elasticsearch(provider, keyid, secret, token, imageid, subscription, te
     test_env.ssh_client[1].run('chmod +x /tmp/install_elasticsearch.sh')
     test_env.ssh_client[1].run('/tmp/install_elasticsearch.sh {} {}'.format(user, test_env.device))
     test_env.ssh_client[1].connect()
-    test_env.run_test_front(ssh_vm_conf=1, testname='elasticsearch', test_cmd=test_cmd,
+    test_env.run_test(ssh_vm_conf=1, testname='elasticsearch', test_cmd=test_cmd,
                       results_path=results_path, timeout=constants.TIMEOUT * 2)
     upload_results(localpath=localpath, table_name='Perf_{}_Elasticsearch'.format(provider),
                     results_path=results_path, parser=ElasticsearchLogsReader,
