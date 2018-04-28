@@ -76,7 +76,7 @@ SYNTHETIC_TESTS = ['test_orion', 'test_orion_raid', 'test_sysbench', 'test_sysbe
                    'test_scheduler', 'test_storage', 'test_tensorflow_gpu']
 AZURE_TESTS = ['test_sql_server_inmemdb']
 NOT_GCE_TESTS = ['test_tensorflow_gpu']
-#GCE doesn’t have quota for gpu
+# GCE doesn't have quota for gpu
 
 DEVICE_AWS = '/dev/sdx'
 DEVICE_AZURE = '/dev/sdc'
